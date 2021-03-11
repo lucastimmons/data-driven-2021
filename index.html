@@ -1,0 +1,206 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<link rel="icon" type="image/png" href="//thecanadianpress-a.akamaihd.net/graphics/d3/fav.ico">
+		<title>Digital Data Desk</title>
+
+		<link rel="stylesheet" href="css/reset.css">
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/blood.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/monokai.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				
+				<section id="slide1">
+					<img id="d3logo" src="img/d3logo2.png" style="position: absolute; margin-left: auto; margin-right: auto; left: 0; right: 0; margin-top: 100px; height: 300px; background: none !important; border: none !important; box-shadow: none !important;">
+					<canvas id="matrix"></canvas>
+				</section>
+				
+				<section>
+					<h3>Data Driven 2021</h3>
+					<span style="display: inline-block;" class="fragment fade-up">Canadian Press COVID-19 automation</span>
+					<br>
+					<span style="display: inline-block;" class="fragment fade-right">A look at how the Digital Data Desk at the Canadian Press developed an automated system for generating COVID-19 stories and multiple charts</span>
+				</section>
+				<section>
+					<section>
+						<h3>Motivation</h2>
+						<ul style="font-size: 50%;">							
+						<li>Client demand for COVID-19 updates</li>
+						<li>Difficulty in organization of distributed staff and multiple data sources</li>
+						<li>Standardized format & eliminating human error</li>
+						<li>Freeing up reporter's time</li>
+						</ul>
+						<br>
+						<a href="#" class="navigate-down">
+							<img data-src="img/down.png" alt="Down arrow" style="width: 100px; background: none !important; border: none !important;">
+						</a>
+					</section>
+					
+					<section>
+						<h3>What does it do?</h2>
+						<p>Automated story about country and provinces and territories </p>
+						<ul style="font-size: 50%;">
+						<li>Cases (new and resolved) - including positivity rate and per capita and rolling averages</li>
+						<li>Deaths - including rolling averages and weekly data</li>
+						<li>Vaccinations - including doses delivered and administered</li>						
+						<li>Charts for wire service and online</li>
+						</ul>						
+						<br>
+						<a href="#" class="navigate-down">
+							<img data-src="img/down.png" alt="Down arrow" style="width: 100px; background: none !important; border: none !important;">
+						</a>
+					</section>					
+					<section data-background-iframe="http://localhost:8888/old/covid-19-generator/" data-background-interactive></section>
+					<section data-background-iframe="https://docs.google.com/spreadsheets/d/1hLRC1X2QxN9fg8vBTLbOX9gNBkiUqaZzCx-hx32M2Ek/edit#gid=0" data-background-interactive></section>
+					<section data-background-iframe="http://localhost:8888/_old_covid-19-automatic/" data-background-interactive></section>
+					<section data-background-image="img/canadaca.png"></section>
+					<section data-background-iframe="http://localhost:8888/covid-19-automatic/index.html" data-background-interactive></section>
+					<section data-background-image="img/how-code.png">
+						<div style="position: absolute; width: 40%; right: 0; box-shadow: 0 1px 4px rgba(0,0,0,0.5), 0 5px 25px rgba(0,0,0,0.2); background-color: rgba(0, 0, 0, 0.9); color: #fff; padding: 20px; font-size: 20px; text-align: left;">
+						<h2>How it works</h2>
+						<p>Powered by javascript</p>
+					</div></section>
+				</section>	
+				
+			
+
+					<section>
+						<h4>Conclusion</h4>
+						<p>Not our biggest or most difficult automation project but incredibly impactful</p>
+					<ul style="font-size: 50%;">
+						<li>Hundreds of hours of work saved so far</li>
+						<li>Ease of use</li>
+						<li>Lessons learned</li>
+						</ul>
+					</section>
+			</div>
+		</div>
+
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				hash: true,
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/highlight/highlight.js' },
+					{ src: 'plugin/notes/notes.js', async: true }
+				]
+			});
+		</script>
+		
+  <script>
+	  
+var canvas = document.getElementById('matrix');
+var ctx = canvas.getContext('2d');
+var fontSize = 18;
+var chars = generateChars();
+var columns;
+var drops; // Current position of last letter (for each column)
+var drawnToBottom;
+
+// Generate Matrix code characters
+function generateChars() {
+  var chars = 'Automation';
+
+  // Get ALL half-width katakana characters by unicode value
+//  for (var i = 0; i <= 55; i++) {
+  //  chars += String.fromCharCode(i + 65382);
+ // }
+  
+  return chars.split('');
+}
+
+// Initialize default canvas state
+function initCanvas() {
+  canvas.width = canvas.parentElement.clientWidth;
+  canvas.height = 600;
+
+  columns = Math.round(canvas.width / fontSize);
+  drops = [];
+
+  // Set initial position on y coordinate for each column
+  for (var i = 0; i < columns; i++) {
+    drops[i] = 1;
+  }
+
+  drawnToBottom = false;
+}
+
+// Resize canvas to fit window
+window.onresize = function() {
+  initCanvas();
+};
+
+function draw() {
+  // Set nearly transparent background so character trail is visible
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+	
+  // Set color and font of falling letters
+  ctx.fillStyle = '#19FF19';
+  ctx.font = 'bold ' + fontSize + 'px monospace';
+
+  var dropCount = drops.length;
+  var charCount = chars.length;
+
+  for (var i = 0; i < dropCount; i++) {
+    // Choose a random letter
+    var text = chars[Math.floor(Math.random() * charCount)];
+    // Get the y position of the letter
+    var rowNum = drops[i] * fontSize;
+		// Draw it!
+    ctx.fillText(text, i * fontSize, rowNum);
+
+    // Check if the canvas has been drawn to the bottom
+    if (rowNum > canvas.height) drawnToBottom = true;
+
+    // Randomly reset the y position of a column
+    if ((!drawnToBottom && Math.random() > 0.925) || (drawnToBottom && Math.random() > 0.95)) drops[i] = 0;
+
+    drops[i]++;
+  }
+}
+
+initCanvas();
+setInterval(draw, 45);	  
+
+
+const button = document.getElementById("d3logo");
+button.addEventListener('click', event => {
+  initCanvas();
+});
+
+	  
+Reveal.addEventListener('slidechanged', function(evt) {
+//	console.log(evt.currentSlide.id)
+  if (evt.currentSlide.id === "slide1") {
+    initCanvas();
+  }
+});
+	  
+	  
+	  </script>	  		
+		
+	</body>
+</html>
